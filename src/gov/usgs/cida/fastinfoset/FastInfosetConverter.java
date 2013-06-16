@@ -180,26 +180,48 @@ public class FastInfosetConverter
 		
 	public static void main(String[] args) {
 		
-		System.out.println("beginning work");
+		String usage = "Usage: 3 arguments" +
+		"\n'xml2fi' or 'fi2XML' to define the sense of the desired reserialization" +
+		"\nsource file to be read" +
+		"\ntarget file to be written";
 		
-		FileInputStream is;
-		FileOutputStream os;
+		if (args.length != 3)
+		{
+			System.out.println(usage);
+			return;
+		}
+		
+		FastInfosetConverter fic = new FastInfosetConverter();
+		
 		try
 		{
-			//is = new FileInputStream("/home/whb/Downloads/qw_portal_map_files/experimental_fi.xml");
-			//os = new FileOutputStream("/home/whb/Downloads/qw_portal_map_files/experimental_fi2.fi");
+			if ("xml2fi".equals(args[0]))
+			{
+				System.out.println("converting XML file " + args[1] + 
+						" to Fast Infoset file " + args[2]);
+				fic.xmlFile2fiFile(args[1], args[2]);
+			}
+			else if ("fi2xml".equals(args[0]))
+			{
+				System.out.println("converting Fast Infoset file " + args[1] + 
+						" to XML file " + args[2]);
+				fic.fiFile2xmlFile(args[1], args[2]);
+			}
+			else
+			{
+				System.out.println("...conversion failed:");
+				System.out.println("first argument '" + args[0] + "' incorrect: " +
+						"must be 'xml2fi' or 'fi2xml'");
+				return;
+			}
 			
-			
-			String srcstr = "/home/whb/Downloads/qw_portal_map_files/experimental_fi.xml";
-			String targstr = "/home/whb/Downloads/qw_portal_map_files/experimental_fi2.fi";
-			
-			FastInfosetConverter fic = new FastInfosetConverter();
-			
-			fic.xmlFile2fiFile(srcstr, targstr);
+			System.out.println ("...conversion complete");
 		}
 		catch (Exception ex)
 		{
-			throw new IllegalStateException(ex);
+			System.out.println("...conversion failed:");
+			System.out.println(ex.getClass().getName());
+			System.out.println(ex.getMessage());
 		}
 	}
 }
