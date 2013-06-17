@@ -16,13 +16,12 @@ help you work manually with Fast Infoset, which is not only very difficult for a
 read, but usually unsupported by XML editors.
 
 FAST INFOSET CONVERTER
-======================
+----------------------
 package gov.usgs.cida.fastinfoset
 
 One file: FastInfosetConverter.java
 
 OVERVIEW
---------
 
 This is a simple utility with two core methods:
 
@@ -41,7 +40,6 @@ which accept file pathnames, reserializing the parsed content of the first and w
 the second. All of the usual file I/O caveats apply.
 
 SETUP AND USE
--------------
 
 There is one dependency jarfile, org.apache.servicemix.bundles.fastinfoset-1.2.2_1.jar, available
 from various mirrors.
@@ -50,10 +48,11 @@ Currently the use would be to instantiate the file in java, and execute its meth
 (quick&dirty example: put your code in main(String[]) and run the file either from the commandline or
 your IDE.)
 
+The commandline parameters are documented in the usage statement in the main method.
+
 Planned extensions are 
-1) to fix the main method to accept proper args, e.g.
-  "java -c gov/usgs/cida/fastinfoset/FastinfosetConverter sourcefile.fi targetfile.xml"
-2) to write a shell script to invoke java.exe and pass the necessare arguments in:
+1) to add a simple jarfile build
+2) to write a shell script to invoke java -jar and pass the necessary arguments in:
   "fi-convert -f sourcefile.fi -x targetfile.xml"
   or something of the sort.
 
