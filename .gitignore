@@ -1,4 +1,5 @@
-/build/
-build.xml
+.vscode
+*.json
 manifest.mf
 /nbproject/
+*.xml
