@@ -9,6 +9,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Starter {
     public static void main(String[] args) throws Exception {
@@ -18,38 +20,47 @@ public class Starter {
         String FILEPATH = "files/to/";
 
         camel.addRoutes(new RouteBuilder() {
-            String filename = "";
+            public String filename = "";
+            String out = "";
             @Override
             public void configure() {
                 from("file:{{from}}?noop=true")
                         .routeId("My Route")
                         .split(body().tokenize("\n"))
                         .streaming()
-                        .process(msg -> {
-                            String line = msg.getIn().getBody(String.class);
-                            if(line.contains("_id")) {
+                        .choice()
+                        .when(exchange -> ((String) exchange.getIn().getBody()).contains("_id"))
+                            .process(msg -> {
+                                String line = msg.getIn().getBody(String.class);
                                 filename = line.substring(32, line.length() - 2);
-                            }
-                            if(line.contains("ВерсияОбъекта")){
-                                String version = line.replaceAll("(\"ВерсияОбъекта\": \"|\",|\\s+|\\\\r\\\\n)", "");
+                            })
+                        .when(exchange -> ((String) exchange.getIn().getBody()).contains("ВерсияОбъекта"))
+                            .process(msg -> {
+                                String line = msg.getIn().getBody(String.class);
 
-                                byte[] bytesEncoded = Base64.getDecoder().decode(version);
+//                                String version = line.replaceAll("(\"ВерсияОбъекта\": \"|\",|\\s+|\\\\r\\\\n)", "");
+                                final String regex = "\\t\\t\\s\\s\\\"(.*?)\\s\\\"|\\\",|(\\\\r\\\\n)";
+                                final Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+                                final Matcher matcher = pattern.matcher(line);
+                                final String result = matcher.replaceAll("");
+
+                                byte[] bytesEncoded = Base64.getDecoder().decode(result);
 
                                 InputStream inStream = new ByteArrayInputStream(bytesEncoded);
 
-                                FileOutputStream outStream = new FileOutputStream(FILEPATH + filename + ".xml");
-
                                 try {
-                                    FastInfosetConverter.fiStream2xmlStream(inStream, outStream);
+                                    out = FastInfosetConverter.fiStream2xmlStream(inStream);
                                 } catch (IllegalArgumentException | IllegalStateException | TransformerException e) {
                                     e.printStackTrace();
                                 }
-                            }
-                            });
+                                msg.getOut().setHeader("filename", filename);
+                                msg.getOut().setBody(out);
+                                })
+                            .to("file:{{to}}?fileName=${headers.filename}.xml");
             }
         });
         camel.start();
-        Thread.sleep(4_000);
+        Thread.sleep(1_000);
         camel.stop();
     }
 }
