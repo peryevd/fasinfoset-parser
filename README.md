@@ -1,5 +1,5 @@
 # fasinfoset-parser
-parser fastinfo in xml
+parser fastinfo in json
 
 
 Setting path to files: /src/main/resources/application.properties
