@@ -5,9 +5,7 @@ import org.jvnet.fastinfoset.FastInfosetSource;
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.StringWriter;
-
 public class FastInfosetConverter {
     private static Integer CountFile = 0;
 

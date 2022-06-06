@@ -1,24 +1,22 @@
 package dima.camel;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.DefaultCamelContext;
 
 import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 public class Starter {
     public static void main(String[] args) throws Exception {
         CamelContext camel = new DefaultCamelContext();
 
         camel.getPropertiesComponent().setLocation("classpath:application.properties");
-        String FILEPATH = "files/to/";
-
         camel.addRoutes(new RouteBuilder() {
             public String filename = "";
             String out = "";
@@ -53,10 +51,14 @@ public class Starter {
                                 } catch (IllegalArgumentException | IllegalStateException | TransformerException e) {
                                     e.printStackTrace();
                                 }
+
+
+                                Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
+                                String json = gson.toJson(SAXConverter.main(out));
                                 msg.getOut().setHeader("filename", filename);
-                                msg.getOut().setBody(out);
+                                msg.getOut().setBody(json);
                                 })
-                            .to("file:{{to}}?fileName=${headers.filename}.xml");
+                            .to("file:{{to}}?fileName=${headers.filename}.json");
             }
         });
         camel.start();
