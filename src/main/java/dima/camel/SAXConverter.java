@@ -13,8 +13,8 @@ import java.io.StringReader;
 import java.util.TreeMap;
 
 public class SAXConverter {
-    public static TreeMap<String,String> items = new TreeMap<String, String>();
-    private static StringBuilder currentValue = new StringBuilder();
+    public static TreeMap<String,String> items = new TreeMap<>();
+    private static final StringBuilder currentValue = new StringBuilder();
     private static int count;
 
     public static TreeMap<String, String> main(String args) throws ParserConfigurationException, SAXException, IOException {
@@ -24,7 +24,7 @@ public class SAXConverter {
 
         XMLHandler handler = new XMLHandler();
         parser.parse(new InputSource(new StringReader(args)), handler);
-        System.out.println(items);
+//        System.out.println(items);
 
         return items;
     }
@@ -33,12 +33,12 @@ public class SAXConverter {
         private String lastElementName;
 
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attributes) {
             lastElementName = qName;
         }
 
         @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
+        public void characters(char[] ch, int start, int length) {
                 String information = new String(ch, start, length);
                 information = information.replace("\n", "").trim();
 
