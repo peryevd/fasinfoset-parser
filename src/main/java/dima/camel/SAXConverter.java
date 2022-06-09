@@ -13,27 +13,28 @@ import java.io.StringReader;
 import java.util.TreeMap;
 
 public class SAXConverter {
-    public static TreeMap<String,String> items = new TreeMap<>();
-    private static final StringBuilder currentValue = new StringBuilder();
-    private static int count;
+    public static TreeMap items = new TreeMap<String, String>();
 
-    public static TreeMap<String, String> main(String args) throws ParserConfigurationException, SAXException, IOException {
+    public static TreeMap main(String args) throws ParserConfigurationException, SAXException, IOException {
         // Создание фабрики и образца парсера
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser parser = factory.newSAXParser();
 
         XMLHandler handler = new XMLHandler();
         parser.parse(new InputSource(new StringReader(args)), handler);
-//        System.out.println(items);
 
         return items;
     }
 
     private static class XMLHandler extends DefaultHandler {
         private String lastElementName;
+        private String ownerAttr;
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) {
+            if(qName.equals("ОбъектВладелец")){
+                ownerAttr = attributes.getValue("xsi:type");
+            }
             lastElementName = qName;
         }
 
@@ -44,17 +45,15 @@ public class SAXConverter {
 
             if (!information.isEmpty()) {
                 switch (lastElementName) {
-                    case  ("Ref"):
-                        SAXConverter.items.put("id", "CatalogObject.Документы|" + information);
-                        break;
-                    case ("Организация"):
-                        SAXConverter.items.put("org", information);
-                        break;
-                    case ("ЗначениеN"):
-                        break;
-                    default:
-                        SAXConverter.items.put(lastElementName, information);
-                        break;
+                    case ("Ref") -> SAXConverter.items.put("id", "CatalogObject.Документы|" + information);
+                    case ("Организация") -> SAXConverter.items.put("org", information);
+                    case ("ОбъектВладелец") -> {
+                        TreeMap<String, String> obj = new TreeMap<>();
+                        obj.put("ref", information);
+                        obj.put("type", ownerAttr);
+                        SAXConverter.items.put("АвторВерсии", obj);
+                    }
+                    default -> SAXConverter.items.put(lastElementName, information);
                 }
             }
         }
