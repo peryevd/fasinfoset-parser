@@ -30,6 +30,7 @@ public class SAXConverter {
         private String lastElementName;
         private String ownerAttr;
 
+    //  Сохраняем значиние атрибута для последующей записи
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) {
             if(qName.equals("ОбъектВладелец")){
@@ -37,12 +38,12 @@ public class SAXConverter {
             }
             lastElementName = qName;
         }
-
+    //  Реагируем на каждый текст внутри тегов
         @Override
         public void characters(char[] ch, int start, int length) {
                 String information = new String(ch, start, length);
                 information = information.replace("\n", "").trim();
-
+    //  Меняем тег или текст если требуется, если нет - добавляем без изменений
             if (!information.isEmpty()) {
                 switch (lastElementName) {
                     case ("Ref") -> SAXConverter.items.put("id", "CatalogObject.Документы|" + information);

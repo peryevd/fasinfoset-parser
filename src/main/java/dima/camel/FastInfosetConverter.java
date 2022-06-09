@@ -9,7 +9,6 @@ import java.io.StringWriter;
 public class FastInfosetConverter {
     public static String fiStream2xmlStream(InputStream fiSourceStream)
             throws IllegalArgumentException, IllegalStateException, TransformerException {
-
         // sanity
         if (fiSourceStream == null)
             throw new IllegalArgumentException("parameter 'fiSourceStream' not permitted to be null");
@@ -20,6 +19,7 @@ public class FastInfosetConverter {
             tx.setOutputProperty(OutputKeys.INDENT, "yes");
             // Perform the transformation
             StringWriter writer = new StringWriter();
+            //Трансформ из стрима файлов в врайтер
             tx.transform(new FastInfosetSource(fiSourceStream), new StreamResult(writer));
 
             return writer.toString();
